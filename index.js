@@ -9,11 +9,8 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 app.use(cors());
 app.use(express.json());
 
-//
-//
-
-// console.log(process.env.DB_User)
-// console.log(process.env.DB_PASS)
+// console.log(process.env.DB_User);
+// console.log(process.env.DB_PASS);
 
 const uri = `mongodb+srv://${process.env.DB_User}:${process.env.DB_PASS}@cluster0.ymhxj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // console.log(uri);
@@ -34,6 +31,12 @@ async function run() {
 
     const productCollection = client.db("productDB").collection("product");
 
+    app.get("/product", async (req, res) => {
+      const cursor = productCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     app.post("/product", async (req, res) => {
       const newProduct = req.body;
       console.log(newProduct);
@@ -47,7 +50,7 @@ async function run() {
     );
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
