@@ -30,6 +30,8 @@ async function run() {
     // Send a ping to confirm a successful connection
 
     const productCollection = client.db("productDB").collection("product");
+    // create collection which is blog
+    const blogCollection = client.db("productDB").collection("blog");
 
     app.get("/product", async (req, res) => {
       const cursor = productCollection.find();
@@ -81,6 +83,63 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productCollection.deleteOne(query);
+      res.send(result);
+    });
+    // blog routes
+    app.get("/blog", async (req, res) => {
+      const cursor = blogCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    app.get("/blog/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await blogCollection.findOne(query);
+      res.send(result);
+    });
+
+    // app.post("/blog", async (req, res) => {
+    //   const newBlog = req.body;
+    //   console.log(newBlog);
+    //   const result = await blogCollection.insertOne(newBlog);
+    //   res.send(result);
+    // });
+
+    app.post("/blog", async (req, res) => {
+      const newBlog = req.body;
+      console.log(newBlog);
+      const result = await blogCollection.insertOne(newBlog);
+      res.send(result);
+    });
+
+    app.put("/blog/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const optional = { upsert: true };
+      const updateBlog = req.body;
+      const blogUpdate = {
+        $set: {
+          title: updateBlog.title,
+          content: updateBlog.content,
+          author: updateBlog.author,
+          date: updateBlog.date,
+          tags: updateBlog.tags,
+        },
+      };
+
+      const result = await blogCollection.updateOne(
+        filter,
+        blogUpdate,
+        optional
+      );
+      res.send(result);
+    });
+
+    app.delete("/blog/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await blogCollection.deleteOne(query);
       res.send(result);
     });
 
